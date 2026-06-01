@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOSHI STUDIO — Apps for Everyday Moments</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: rgba(255,255,255,0.06);
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --accent: #c8a96e;
+    --accent-dim: rgba(200,169,110,0.12);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Pretendard', -apple-system, sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  .stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+  .star {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0;
+    background: var(--accent);
+    animation: twinkle var(--dur) var(--delay) infinite;
+  }
+  @keyframes twinkle { 0%,100%{opacity:0} 50%{opacity:var(--max-op)} }
+  .wrapper { position: relative; z-index: 1; max-width: 960px; margin: 0 auto; padding: 0 32px; }
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(12px);
+  }
+  nav .inner {
+    max-width: 960px; margin: 0 auto; padding: 0 32px;
+    height: 56px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .logo-star { font-size: 16px; color: var(--accent); animation: spin 20s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .logo-text { font-size: 13px; font-weight: 500; color: var(--text); letter-spacing: 0.2em; }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a {
+    color: var(--muted); text-decoration: none; font-size: 11px;
+    letter-spacing: 0.12em; text-transform: uppercase; transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+  .hero { padding: 160px 0 100px; text-align: center; }
+  .hero-label {
+    font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 28px;
+    opacity: 0; animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .hero h1 {
+    font-size: clamp(40px, 7vw, 72px); font-weight: 300; line-height: 1.1;
+    color: var(--text); margin-bottom: 28px; letter-spacing: -0.01em;
+    opacity: 0; animation: fadeUp 0.8s 0.4s forwards;
+  }
+  .hero h1 em { font-style: normal; color: var(--accent); }
+  .hero p {
+    max-width: 480px; margin: 0 auto 48px; color: var(--muted);
+    font-size: 13px; line-height: 1.85;
+    opacity: 0; animation: fadeUp 0.8s 0.6s forwards;
+  }
+  .hero-cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 28px; border: 1px solid var(--accent);
+    color: var(--accent); text-decoration: none; font-size: 11px;
+    letter-spacing: 0.15em; text-transform: uppercase; transition: all 0.25s;
+    opacity: 0; animation: fadeUp 0.8s 0.8s forwards;
+  }
+  .hero-cta:hover { background: var(--accent-dim); }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  .divider { display: flex; align-items: center; gap: 16px; margin: 0 0 64px; }
+  .divider-line { flex: 1; height: 1px; background: var(--border); }
+  .divider-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
+  #apps { padding: 80px 0; }
+  .apps-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1px; background: var(--border); border: 1px solid var(--border);
+  }
+  .app-card {
+    background: var(--bg); padding: 40px;
+    display: flex; flex-direction: column; gap: 14px;
+    transition: background 0.25s; position: relative; overflow: hidden;
+  }
+  .app-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform 0.4s;
+  }
+  .app-card:hover { background: var(--surface); }
+  .app-card:hover::before { transform: scaleX(1); }
+  .app-number { font-size: 10px; letter-spacing: 0.2em; color: var(--accent); opacity: 0.5; }
+  .app-icon { font-size: 28px; line-height: 1; }
+  .app-name { font-size: 22px; font-weight: 400; color: var(--text); line-height: 1.2; }
+  .app-category { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+  .app-desc { color: var(--muted); font-size: 12px; line-height: 1.8; flex: 1; }
+  .app-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: var(--accent); text-decoration: none; font-size: 11px;
+    letter-spacing: 0.1em; margin-top: 8px; transition: gap 0.2s;
+  }
+  .app-link:hover { gap: 10px; }
+  .app-link svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+  #about { padding: 80px 0 100px; border-top: 1px solid var(--border); }
+  .about-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 64px; align-items: start; }
+  .about-label { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  .about-title { font-size: 32px; font-weight: 300; line-height: 1.35; letter-spacing: -0.01em; }
+  .about-body p { color: var(--muted); margin-bottom: 16px; line-height: 1.9; }
+  .about-body p:last-child { margin-bottom: 0; }
+  .stats {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: var(--border); border: 1px solid var(--border); margin-top: 40px;
+  }
+  .stat { background: var(--bg); padding: 28px; text-align: center; }
+  .stat-num { font-size: 36px; font-weight: 300; color: var(--accent); line-height: 1; margin-bottom: 8px; }
+  .stat-label { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
+  #contact { padding: 60px 0 80px; border-top: 1px solid var(--border); text-align: center; }
+  .contact-label { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+  .contact-email { font-size: 22px; font-weight: 300; color: var(--accent); text-decoration: none; transition: opacity 0.2s; }
+  .contact-email:hover { opacity: 0.7; }
+  footer { border-top: 1px solid var(--border); padding: 28px 0; }
+  footer .inner {
+    max-width: 960px; margin: 0 auto; padding: 0 32px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  footer p { font-size: 11px; color: var(--muted); }
+  footer a { color: var(--muted); text-decoration: none; font-size: 11px; transition: color 0.2s; }
+  footer a:hover { color: var(--accent); }
+  @media (max-width: 640px) {
+    .wrapper, nav .inner, footer .inner { padding: 0 20px; }
+    .apps-grid, .stats { grid-template-columns: 1fr; }
+    .about-grid { grid-template-columns: 1fr; gap: 32px; }
+    .nav-links { display: none; }
+    footer .inner { flex-direction: column; gap: 8px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<nav>
+  <div class="inner">
+    <a href="#" class="logo">
+      <span class="logo-star">✦</span>
+      <span class="logo-text">HOSHI STUDIO</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#apps">Apps</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="wrapper">
+  <section class="hero">
+    <p class="hero-label">Seoul, Korea · Independent iOS App Studio</p>
+    <h1>Apps for<br><em>everyday moments</em></h1>
+    <p>We build quiet, purposeful iOS apps rooted in psychology and human experience — tools that help you reflect, feel, and move forward.</p>
+    <a href="#apps" class="hero-cta">
+      View our apps
+      <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+    </a>
+  </section>
+
+  <section id="apps">
+    <div class="divider">
+      <div class="divider-line"></div>
+      <span class="divider-label">Our Apps</span>
+      <div class="divider-line"></div>
+    </div>
+    <div class="apps-grid">
+      <div class="app-card">
+        <span class="app-number">01</span>
+        <div class="app-icon">🔥</div>
+        <h2 class="app-name">분노일기</h2>
+        <span class="app-category">Lifestyle · Emotional Wellness</span>
+        <p class="app-desc">화를 참지 않아도 되는 곳. 감정을 안전하게 쏟아내고, 식히고, 버리는 공간입니다. Pennebaker 표현적 글쓰기, CBT, Temporal Distancing 기반으로 설계됐습니다.</p>
+        <a href="https://apps.apple.com/kr/app/%EB%B6%84%EB%85%B8%EC%9D%BC%EA%B8%B0/id6767602528" class="app-link" target="_blank" rel="noopener">App Store <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+      </div>
+      <div class="app-card">
+        <span class="app-number">02</span>
+        <div class="app-icon">🌙</div>
+        <h2 class="app-name">꿈과 현실</h2>
+        <span class="app-category">Lifestyle · Dream Journal</span>
+        <p class="app-desc">꿈과 현실, 두 가지 일기를 하나의 앱에서. 잠에서 깨어나는 순간의 흐릿한 기억을 놓치기 전에 기록하세요. 일상과 꿈이 함께 쌓여가는 나만의 아카이브.</p>
+        <a href="https://apps.apple.com/kr/app/%EA%BF%88%EA%B3%BC-%ED%98%84%EC%8B%A4/id6767109599" class="app-link" target="_blank" rel="noopener">App Store <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+      </div>
+      <div class="app-card">
+        <span class="app-number">03</span>
+        <div class="app-icon">📖</div>
+        <h2 class="app-name">하루 한절</h2>
+        <span class="app-category">Lifestyle · Scripture & Meditation</span>
+        <p class="app-desc">매일 한 절의 성경 말씀과 함께하는 묵상, 필사, 기도 일기. 하루 한 번, 말씀 앞에 조용히 앉는 시간을 만들어 드립니다.</p>
+        <a href="https://apps.apple.com/kr/app/%ED%95%98%EB%A3%A8-%ED%95%9C%EC%A0%88/id6770842699" class="app-link" target="_blank" rel="noopener">App Store <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+      </div>
+      <div class="app-card">
+        <span class="app-number">04</span>
+        <div class="app-icon">✦</div>
+        <h2 class="app-name">오늘한시</h2>
+        <span class="app-category">Lifestyle · Poetry</span>
+        <p class="app-desc">매일 한 편의 시와 따뜻한 해설. 하루의 소음 속에서 잠깐 멈추는 시간. 시인의 언어로 오늘을 다르게 바라보게 해드립니다.</p>
+        <a href="https://apps.apple.com/kr/app/%EC%98%A4%EB%8A%98%ED%95%9C%EC%8B%9C-%EB%A7%A4%EC%9D%BC-%ED%95%9C-%ED%8E%B8%EC%9D%98-%EB%AA%85%EC%8B%9C/id6773029651" class="app-link" target="_blank" rel="noopener">App Store <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+      </div>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="about-grid">
+      <div>
+        <p class="about-label">About</p>
+        <h2 class="about-title">Independent.<br>Intentional.<br>Human.</h2>
+      </div>
+      <div class="about-body">
+        <p>HOSHI STUDIO is an independent iOS app studio based in Seoul, Korea. We build small, focused apps that address the quiet, personal parts of daily life — emotions, habits, reflection, and meaning.</p>
+        <p>Every app we ship is grounded in a real human need. We don't chase trends. We design experiences that feel considered, calm, and honest — tools you can trust with your inner life.</p>
+        <p>All apps are built with privacy in mind. Data stays on your device. We don't sell your information. We believe the best apps are the ones you barely notice — they just make your day a little better.</p>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num">4</div>
+        <div class="stat-label">Apps Published</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">iOS</div>
+        <div class="stat-label">Platform</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">2026</div>
+        <div class="stat-label">Founded</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <p class="contact-label">Get in Touch</p>
+    <a href="mailto:hoshi.developers@gmail.com" class="contact-email">hoshi.developers@gmail.com</a>
+  </section>
+</div>
+
+<footer>
+  <div class="inner">
+    <p>© 2026 HOSHI STUDIO. All rights reserved.</p>
+    <a href="https://www.notion.so/365c10fd580680adb081d36b2b984c6b" target="_blank" rel="noopener">Privacy Policy</a>
+  </div>
+</footer>
+
+<script>
+  const container = document.getElementById('stars');
+  for (let i = 0; i < 120; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;--dur:${3+Math.random()*5}s;--delay:${Math.random()*6}s;--max-op:${0.1+Math.random()*0.4};width:${Math.random()>0.8?2:1}px;height:${Math.random()>0.8?2:1}px;`;
+    container.appendChild(s);
+  }
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '0';
+        e.target.style.animation = `fadeUp 0.6s ${i*0.1}s forwards`;
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.app-card').forEach(c => obs.observe(c));
+</script>
+</body>
+</html>
